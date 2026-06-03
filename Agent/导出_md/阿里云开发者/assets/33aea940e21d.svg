@@ -1,0 +1,68 @@
+  <svg role="graphics-document document" style="max-width: 598px;" viewBox="0 0 598 450" xmlns="http://www.w3.org/2000/svg" width="598" height="450">
+   <g>
+   </g>
+   <g transform="translate(225,225)">
+    <circle class="pieOuterCircle" r="186" cy="0" cx="0">
+    </circle>
+    <path class="pieCircle" fill="#ECECFF" d="M0,-185A185,185,0,1,1,-108.74,149.668L0,0Z">
+    </path>
+    <path class="pieCircle" fill="#ffffde" d="M-108.74,149.668A185,185,0,0,1,-175.945,-57.168L0,0Z">
+    </path>
+    <path class="pieCircle" fill="hsl(80, 100%, 56.2745098039%)" d="M-175.945,-57.168A185,185,0,0,1,0,-185L0,0Z">
+    </path>
+    <text style="text-anchor: middle;" class="slice" transform="translate(131.95909163595255,42.87610796952398)">
+     
+     
+     
+     60%
+    </text>
+    <text style="text-anchor: middle;" class="slice" transform="translate(-131.95909163595255,42.876107969523964)">
+     
+     
+     
+     20%
+    </text>
+    <text style="text-anchor: middle;" class="slice" transform="translate(-81.55520375558066,-112.25110796952394)">
+     
+     
+     
+     20%
+    </text>
+    <text class="pieTitleText" y="-200" x="0">
+     
+     
+     
+     奖励函数权重分布
+    </text>
+    <g transform="translate(216,-33)" class="legend">
+     <rect style="fill: rgb(236, 236, 255); stroke: rgb(236, 236, 255);" height="18" width="18">
+     </rect>
+     <text y="14" x="22">
+      
+      
+      
+      答案质量
+     </text>
+    </g>
+    <g transform="translate(216,-11)" class="legend">
+     <rect style="fill: rgb(255, 255, 222); stroke: rgb(255, 255, 222);" height="18" width="18">
+     </rect>
+     <text y="14" x="22">
+      
+      
+      
+      格式完整性
+     </text>
+    </g>
+    <g transform="translate(216,11)" class="legend">
+     <rect style="fill: rgb(181, 255, 32); stroke: rgb(181, 255, 32);" height="18" width="18">
+     </rect>
+     <text y="14" x="22">
+      
+      
+      
+      思考过程
+     </text>
+    </g>
+   </g>
+  </svg>
