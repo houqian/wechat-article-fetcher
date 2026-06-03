@@ -1,0 +1,13 @@
+{
+  "Skills · 技能": ["skill"],
+  "协议与工具调用 (MCP / A2A / Function Calling)": ["mcp", "a2a", "ag-ui", "function call", "agent2agent"],
+  "ReAct · 推理 · 工作流范式": ["react", "ralph loop", "workflow", "工作流", "规划调用工具"],
+  "记忆 · 上下文 · 知识库": ["记忆", "memory", "上下文", "知识库", "知识采集", "wiki", "obsidian"],
+  "AI Coding · 编程智能体": ["ai coding", "coding", "claude code", "编码", "编程", "agents.md", "自我编程", "控制台", "subagent"],
+  "评测 · 测试 · 可观测 · 可信": ["评测", "测试", "可观测", "受控", "信任", "模糊测试", "验数", "verify"],
+  "框架 · 运行时 · 源码拆解": ["spring ai", "agentscope", "harness", "源码", "运行时", "arthas", "hermes", "assistant agent", "staragent", "webterminal", "架构演进", "技术选型"],
+  "多智能体 · 编排 (Multi-Agent)": ["multi-agent", "多智能体", "multiagent", "编排", "多 agent", "多agent"],
+  "行业落地 · 企业业务实践": ["落地", "企业", "商旅", "差旅", "交易", "客服", "运维", "能源", "数据分析", "dataagent", "text-to-sql", "云小二", "可复用"],
+  "应用实战 · 趣味 Demo": ["狼人杀", "旅行", "可视化", "chatbi", "deepinsight", "openclaw", "绘图", "svg", "定制自己的"],
+  "入门 · 概念 · 范式思考": []
+}
