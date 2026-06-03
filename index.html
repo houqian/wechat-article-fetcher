@@ -12,13 +12,8 @@
     .sidebar { font-size: 14px; }
     .markdown-section { max-width: 820px; }
     .markdown-section img { border-radius: 4px; }
-    /* 右侧文章内 TOC */
-    .page_toc { position: fixed; right: 16px; top: 80px; width: 240px;
-      max-height: 80vh; overflow: auto; font-size: 13px; }
-    .page_toc p.title { font-weight: 600; margin-bottom: 6px; }
-    .page_toc a { display: block; line-height: 1.6; color: #6b7280; text-decoration: none; }
-    .page_toc a:hover, .page_toc a.active { color: var(--theme-color); }
-    @media (max-width: 1300px) { .page_toc { display: none; } }
+    /* 右侧 TOC 容器的定位由插件自带 light.css 处理，这里只做轻微外观微调 */
+    aside.toc-nav .page_toc p.title { font-size: 1.05em; }
   </style>
 </head>
 <body>
