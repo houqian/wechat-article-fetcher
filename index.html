@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>公众号文章库</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="按主题与公众号整理的文章合集，在线阅读" />
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css" />
+  <style>
+    :root { --theme-color: #3F8AE2; }
+    .sidebar { font-size: 14px; }
+    .markdown-section { max-width: 860px; }
+    .markdown-section img { border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <div id="app">加载中…</div>
+  <script>
+    window.$docsify = {
+      name: '📚 公众号文章库',
+      repo: 'houqian/wechat-article-fetcher',
+      loadSidebar: true,
+      // 所有页面统一使用根目录的 _sidebar.md
+      alias: { '.*/_sidebar.md': '/_sidebar.md' },
+      // 让文章里的相对图片路径(assets/xxx)相对当前文章解析
+      relativePath: true,
+      homepage: 'home.md',
+      maxLevel: 3,
+      subMaxLevel: 0,
+      auto2top: true,
+      search: {
+        placeholder: '搜索文章…',
+        noData: '找不到结果',
+        depth: 3,
+      },
+    };
+  </script>
+  <script src="//cdn.jsdelivr.net/npm/docsify@4/lib/docsify.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify@4/lib/plugins/zoom-image.min.js"></script>
+</body>
+</html>
