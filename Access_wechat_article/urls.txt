@@ -1,0 +1,7 @@
+# 在这里逐行粘贴要下载的微信公众号文章链接 (每行一个)
+# 以 # 开头的行是注释, 会被忽略。
+# 然后双击 to_markdown 之前请先用 download_md: 双击运行 下方对应的 bat, 或执行 python download_md.py
+#
+# 示例 (取消注释即可使用):
+# https://mp.weixin.qq.com/s/xxxxxxxxxxxxxxxxxx
+# https://mp.weixin.qq.com/s/yyyyyyyyyyyyyyyyyy
