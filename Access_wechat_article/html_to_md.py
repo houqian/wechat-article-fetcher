@@ -19,6 +19,7 @@ html_to_md.py — 将功能3下载的微信公众号文章 (index.html) 批量�
 import os
 import re
 import sys
+import json
 import hashlib
 from pathlib import Path
 
@@ -199,6 +200,182 @@ def _promote_headings(content):
             block.replace_with(new)
 
 
+# ---------------------------------------------------------------------------
+# 微信代码块还原 (code-snippet)
+# 微信编辑器的代码结构: <section class="code-snippet__fix">
+#   <ul class="code-snippet__line-index"><li/>×N</ul>   <- 行号列(空li, 转md后变 * * * 噪声)
+#   <pre data-lang="java"><code>每行一个code</code>...</pre>
+# 直接交给 html2text 会丢失换行且混入行号噪声, 故先抽出原文, 转完再回填 fenced block。
+# ---------------------------------------------------------------------------
+_CODE_TOKEN = 'WXCODEBLOCKTOKEN{}END'
+
+
+def _extract_code_blocks(content) -> list:
+    """把代码块整体替换为占位符文本, 返回 [(lang, code_text), ...]"""
+    blocks = []
+    pres = [p for p in content.find_all('pre')
+            if p.find('code') or 'code-snippet' in ' '.join(p.get('class') or [])]
+    for pre in pres:
+        lang = (pre.get('data-lang') or '').strip().lower()
+        code_lines = [c.get_text().replace('\xa0', ' ').rstrip()
+                      for c in pre.find_all('code')]
+        text = '\n'.join(code_lines).strip('\n') if code_lines else \
+            pre.get_text().replace('\xa0', ' ').strip('\n')
+        if not text.strip():
+            continue
+        # 替换目标: 含行号ul的外层 section 整体; 否则 pre 自身
+        target = pre
+        parent = pre.parent
+        if parent is not None and parent.name == 'section' and \
+                parent.find('ul', class_=re.compile(r'code-snippet')) is not None:
+            target = parent
+        holder = BeautifulSoup('', 'lxml').new_tag('p')
+        holder.string = _CODE_TOKEN.format(len(blocks))
+        target.replace_with(holder)
+        blocks.append((lang, text))
+    # 残留的孤儿行号列 (ul 不在 pre 的 section 里) 直接删除
+    for ul in content.find_all('ul', class_=re.compile(r'code-snippet__line-index')):
+        ul.decompose()
+    return blocks
+
+
+def _restore_code_blocks(md: str, blocks: list) -> str:
+    """把占位符回填为 fenced code block"""
+    for i, (lang, text) in enumerate(blocks):
+        fenced = f'```{lang}\n{text}\n```'
+        md = md.replace(_CODE_TOKEN.format(i), fenced)
+    return md
+
+
+# ---------------------------------------------------------------------------
+# 按公众号定制的"文本编号大纲" (heading_profiles.json)
+# 适用纯文本编号风格的公众号 (如 东阳马生架构):
+#   文首"大纲(N字)"块列出一级目录 1.xxx ~ N.xxx, 正文原样重现这些行作章节标题,
+#   章节内再用 (1)xxx / 一.xxx 分层。
+# ---------------------------------------------------------------------------
+_PROFILE_PATH = Path(__file__).parent / 'heading_profiles.json'
+_profiles_cache = None
+
+
+def _load_profiles() -> dict:
+    global _profiles_cache
+    if _profiles_cache is None:
+        try:
+            raw = json.loads(_PROFILE_PATH.read_text(encoding='utf-8'))
+            _profiles_cache = {k: v for k, v in raw.items() if not k.startswith('_')}
+        except Exception:
+            _profiles_cache = {}
+    return _profiles_cache
+
+
+def _unbold(s: str) -> str:
+    """去掉 markdown 粗体标记 (微信编辑器常把标题整行加粗, 甚至拆碎成多段 **)"""
+    return s.replace('**', '').strip()
+
+
+def _split_glued_toc(s: str, start_n: int) -> list:
+    """把粘连成一行的目录拆开: '6.aaa7.bbb8.ccc' -> ['6.aaa','7.bbb','8.ccc']
+
+    按序号递增顺序切分; 要求 s 以 '<start_n>.' 开头, 否则返回 []。
+    """
+    if not re.match(rf'^{start_n}\.(?!\d)', s):
+        return []
+    items, n, pos = [], start_n, 0
+    while True:
+        m = re.search(rf'(?<!\d){n + 1}\.(?!\d)', s[pos + 2:])
+        if not m:
+            items.append(s[pos:].strip())
+            break
+        cut = pos + 2 + m.start()
+        items.append(s[pos:cut].strip())
+        pos, n = cut, n + 1
+    return items
+
+
+def _extract_toc(lines: list, marker_re) -> tuple:
+    """定位文首目录块, 返回 (目录项列表, 块起始行号(含标记行), 块结束行号(不含))"""
+    for i, ln in enumerate(lines[:60]):
+        if not marker_re.match(_unbold(ln)):
+            continue
+        items, expect, j, end = [], 1, i + 1, i + 1
+        while j < len(lines) and j - i < 300:
+            s = _unbold(lines[j])
+            if not s:
+                j += 1
+                continue
+            if items and re.sub(r'\s+', '', s) == re.sub(r'\s+', '', items[0]):
+                break          # 正文从第一条重现开始
+            got = _split_glued_toc(s, expect)
+            if not got:
+                break          # 不再是连续编号 -> 目录块结束
+            if len(got) > 1:
+                # 校验粘连拆分: 标题里的 "2.x" 这类文本会被误拆。
+                # 拆出多项后, 下一非空行应衔接上 (以 expect+len(got) 号开头);
+                # 若它反而衔接"不拆"的序号 (expect+1), 说明拆错, 回退为整行一条。
+                nxt = ''
+                for k in range(j + 1, min(j + 6, len(lines))):
+                    if _unbold(lines[k]):
+                        nxt = _unbold(lines[k])
+                        break
+                if not re.match(rf'^{expect + len(got)}\.(?!\d)', nxt) and \
+                        re.match(rf'^{expect + 1}\.(?!\d)', nxt):
+                    got = [s]
+            items.extend(got)
+            expect += len(got)
+            end = j + 1
+            j += 1
+        if items:
+            return items, i, end
+    return [], -1, -1
+
+
+def _apply_text_outline(md: str, profile: dict) -> str:
+    """按 profile 的文本规则把编号行提升为 markdown 标题; 目录块重排为列表"""
+    lines = md.split('\n')
+    toc_items, t0, t1 = [], -1, -1
+    marker = profile.get('toc_marker')
+    if marker:
+        toc_items, t0, t1 = _extract_toc(lines, re.compile(marker))
+    toc_set = {re.sub(r'\s+', '', it) for it in toc_items}
+    max_len = profile.get('max_len', 45)
+    bad_end = profile.get('exclude_trailing_punct', '。！？!?；;，,')
+    rules = [(re.compile(r['pattern']), r['level'], r.get('require_in_toc', False))
+             for r in profile.get('rules', [])]
+
+    out, in_fence = [], False
+    for idx, line in enumerate(lines):
+        if t0 != -1 and t0 < idx < t1:
+            continue                       # 原目录块行, 由下方统一重排
+        s = line.strip()
+        if s.startswith('```'):
+            in_fence = not in_fence
+            out.append(line)
+            continue
+        if in_fence or line.startswith('    '):
+            out.append(line)               # 代码内不动
+            continue
+        sc = _unbold(s)                    # 标题行常被整行加粗(甚至拆碎), 剥掉再匹配
+        if t0 != -1 and idx == t0:         # 目录标记行 -> 重排整个目录块
+            out.append(f'**{sc}**')
+            out.append('')
+            out.extend(f'- {it}' for it in toc_items)
+            out.append('')
+            continue
+        promoted = False
+        if sc and len(sc) <= max_len and sc[-1] not in bad_end:
+            for pat, level, need_toc in rules:
+                if not pat.match(sc):
+                    continue
+                if need_toc and toc_set and re.sub(r'\s+', '', sc) not in toc_set:
+                    continue
+                out.append('#' * level + ' ' + sc)
+                promoted = True
+                break
+        if not promoted:
+            out.append(line)
+    return '\n'.join(out)
+
+
 def _cleanup_md(md: str) -> str:
     """清理转换结果: 去空标题、合并多余空行、去行尾空白"""
     lines = []
@@ -234,7 +411,17 @@ def convert_one(html_path: Path) -> bool:
         return False
 
     _normalize_images(content, html_path.parent)
-    _promote_headings(content)   # 还原标题层级 (大纲)
+    code_blocks = _extract_code_blocks(content)   # 先抽出代码块(占位), 防止换行丢失
+
+    # 有专属文本大纲规则的公众号跳过通用视觉规则, 防止两套规则给出错误层级
+    profile = _load_profiles().get(meta.get('公众号', ''))
+    if not profile:
+        _promote_headings(content)   # 还原标题层级 (大纲, 通用视觉规则)
+
+    # html2text 不把 <section> 当块级元素, 相邻 section 的文本会粘连成一行;
+    # 统一改名为 <div> (html2text 识别为块级), 保证段落/标题各占一行
+    for sec in content.find_all('section'):
+        sec.name = 'div'
 
     h = html2text.HTML2Text()
     h.body_width = 0          # 不自动换行
@@ -243,6 +430,11 @@ def convert_one(html_path: Path) -> bool:
     h.protect_links = True
     h.unicode_snob = True     # 保留中文/Unicode 原样
     md_body = _cleanup_md(h.handle(str(content)).strip())
+    md_body = _restore_code_blocks(md_body, code_blocks)
+
+    # 公众号专属文本大纲规则 (heading_profiles.json)
+    if profile:
+        md_body = _apply_text_outline(md_body, profile)
 
     # 组装 markdown
     lines = [f'# {title}', '']
