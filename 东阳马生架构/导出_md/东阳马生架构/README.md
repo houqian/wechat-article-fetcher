@@ -1,6 +1,6 @@
 # 东阳马生架构 · 文章目录索引
 
-共 **163** 篇，按子主题归类（点击标题打开对应 Markdown）。
+共 **165** 篇，按子主题归类（点击标题打开对应 Markdown）。
 
 > 分类配置: `categories.json`；由 `make_index.py` 自动生成。
 
@@ -9,9 +9,9 @@
 - [面试要点总结](#面试要点总结) (46)
 - [分布式锁](#分布式锁) (7)
 - [ZooKeeper](#ZooKeeper) (13)
-- [Dubbo](#Dubbo) (21)
+- [Dubbo](#Dubbo) (22)
 - [Netty](#Netty) (17)
-- [Nacos](#Nacos) (12)
+- [Nacos](#Nacos) (13)
 - [Sentinel](#Sentinel) (9)
 - [Seata](#Seata) (7)
 - [Redis](#Redis) (5)
@@ -116,6 +116,7 @@
 - `2025-08-05` [Dubbo源码—2.服务引用时创建代理的流程](<Dubbo源码—2.服务引用时创建代理的流程.md>)
 - `2025-08-06` [Dubbo源码—3.服务引用时执行RPC的流程](<Dubbo源码—3.服务引用时执行RPC的流程.md>)
 - `2025-08-07` [Dubbo源码—4.集群容错和负载均衡算法](<Dubbo源码—4.集群容错和负载均衡算法.md>)
+- `2025-08-08` [Dubbo源码—5.SPI机制和线程模型](<Dubbo源码—5.SPI机制和线程模型.md>)
 - `2025-08-11` [Dubbo源码—6.Provider端的主要模块上](<Dubbo源码—6.Provider端的主要模块上.md>)
 - `2025-08-12` [Dubbo源码—7.Provider端的主要模块下](<Dubbo源码—7.Provider端的主要模块下.md>)
 - `2025-08-13` [Dubbo源码—8.Consumer端的主要模块上](<Dubbo源码—8.Consumer端的主要模块上.md>)
@@ -151,6 +152,7 @@
 - `2025-04-29` [Nacos源码—2.Nacos服务注册发现分析二](<Nacos源码—2.Nacos服务注册发现分析二.md>)
 - `2025-05-05` [Nacos源码—3.Nacos集群高可用分析一](<Nacos源码—3.Nacos集群高可用分析一.md>)
 - `2025-05-06` [Nacos源码—4.Nacos集群高可用分析二](<Nacos源码—4.Nacos集群高可用分析二.md>)
+- `2025-05-07` [Nacos源码—5.Nacos配置中心实现分析](<Nacos源码—5.Nacos配置中心实现分析.md>)
 - `2025-05-08` [Nacos源码—6.Nacos升级gRPC分析一](<Nacos源码—6.Nacos升级gRPC分析一.md>)
 - `2025-05-09` [Nacos源码—7.Nacos升级gRPC分析二](<Nacos源码—7.Nacos升级gRPC分析二.md>)
 - `2025-05-12` [Nacos源码—8.Nacos升级gRPC分析三](<Nacos源码—8.Nacos升级gRPC分析三.md>)
