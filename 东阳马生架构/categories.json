@@ -1,0 +1,16 @@
+{
+  "面试要点总结": ["面试准备"],
+  "分布式锁": ["分布式锁"],
+  "ZooKeeper": ["zk", "zookeeper"],
+  "Dubbo": ["dubbo"],
+  "Netty": ["netty"],
+  "Nacos": ["nacos"],
+  "Sentinel": ["sentinel"],
+  "Seata": ["seata"],
+  "Redis": ["redis"],
+  "JVM与G1": ["g1", "jvm"],
+  "JUC并发": ["juc"],
+  "MySQL": ["mysql"],
+  "高性能组件": ["disruptor", "leveldb", "eventbus"],
+  "架构实战与其他": []
+}
